@@ -1,0 +1,300 @@
+/* App.css */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f5f7;
+  margin: 0;
+  padding: 0;
+}
+
+.board-container {
+  overflow-x: auto;
+  white-space: nowrap;
+  padding: 10px;
+}
+
+.board {
+  display: flex;
+  gap: 20px;
+}
+
+.list {
+  min-width: 250px;
+  max-width: 250px;
+  background-color: #f8f9fa;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.card {
+  position: relative;
+  background: white;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+}
+
+.edit-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  cursor: pointer;
+  display: none;
+}
+
+.card:hover .edit-icon {
+  display: inline;
+}
+
+.footer {
+  text-align: center;
+  padding: 10px;
+  background: #f1f1f1;
+}
+
+
+
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.reset-button {
+  background: #eb9287;
+  border: none;
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.board {
+  display: flex;
+  overflow-x: auto;
+  gap: 15px;
+  padding: 20px;
+  max-width: 1200px;
+}
+
+.list {
+  background: rgb(146, 198, 224);
+  padding: 10px;
+  width: 250px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.list-title {
+  font-size: 18px;
+}
+
+.delete-list {
+  background: rgb(250, 63, 63);
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  padding: 10px;
+  border-radius: 3px;
+}
+
+.cards {
+  margin-top: 10px;
+}
+
+.card {
+  background: #e3e3e3;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 3px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.add-list {
+  background: #669bb9;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 40%;
+  height: 50%;
+  margin-top: 10px;
+}
+.add-card {
+  background: #669bb9;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+
+
+
+.card {
+  position: relative;
+  background: white;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 5px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+.edit-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+
+.edit-icon:hover {
+  opacity: 1;
+}
+
+input {
+  width: 90%;
+  padding: 5px;
+  border: none;
+  font-size: 14px;
+  background: #f8f9fa;
+  border-radius: 3px;
+}
+
+
+
+/* Footer code */
+
+.footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #f1f1f1;
+  font-size: 14px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  color: #333;
+  border-top: 1px solid #ccc;
+}
+
+/* .app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+} */
+
+/* .header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  background: #7ebaddf0;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+} */
+
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Fixed Header */
+.header {
+  background-color: #0079bf;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 100;
+}
+
+/* Board Container - Horizontally Scrollable */
+.board-container {
+  flex-grow: 1;
+  overflow-x: auto;  /* Enables horizontal scrolling for lists only */
+  overflow-y: hidden;
+  padding: 10px;
+  margin-top: 50px; /* Avoid overlapping header */
+}
+
+/* Board (Holds Lists) */
+.board {
+  display: flex;
+  gap: 16px;
+  padding-bottom: 10px;
+  min-width: fit-content;
+}
+
+/* Lists */
+.list {
+  background: #f4f4f4;
+  padding: 10px;
+  min-width: 300px;
+  border-radius: 8px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  display: inline-block;
+  vertical-align: top;
+}
+
+
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  width: 300px;
+}
+.modal-content {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.due-date {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: #555;
+  margin-top: 5px;
+}
+
+.calendar-icon {
+  color: #ff9800;
+}
