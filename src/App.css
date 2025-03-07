@@ -1,4 +1,3 @@
-/* App.css */
 body {
   font-family: Arial, sans-serif;
   background-color: #f4f5f7;
@@ -6,226 +5,11 @@ body {
   padding: 0;
 }
 
-.board-container {
-  overflow-x: auto;
-  white-space: nowrap;
-  padding: 10px;
-}
-
-.board {
-  display: flex;
-  gap: 20px;
-}
-
-.list {
-  min-width: 250px;
-  max-width: 250px;
-  background-color: #f8f9fa;
-  padding: 10px;
-  border-radius: 5px;
-}
-
-.card {
-  position: relative;
-  background: white;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 4px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.card-content {
-  display: flex;
-  align-items: center;
-}
-
-.edit-icon {
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  cursor: pointer;
-  display: none;
-}
-
-.card:hover .edit-icon {
-  display: inline;
-}
-
-.footer {
-  text-align: center;
-  padding: 10px;
-  background: #f1f1f1;
-}
-
-
-
-
-.title {
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.reset-button {
-  background: #eb9287;
-  border: none;
-  padding: 8px 12px;
-  color: white;
-  cursor: pointer;
-  border-radius: 4px;
-}
-
-.board {
-  display: flex;
-  overflow-x: auto;
-  gap: 15px;
-  padding: 20px;
-  max-width: 1200px;
-}
-
-.list {
-  background: rgb(146, 198, 224);
-  padding: 10px;
-  width: 250px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.list-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding-bottom: 10px;
-  border-bottom: 1px solid #ccc;
-}
-
-.list-title {
-  font-size: 18px;
-}
-
-.delete-list {
-  background: rgb(250, 63, 63);
-  color: white;
-  border: none;
-  cursor: pointer;
-  width: 40px;
-  padding: 10px;
-  border-radius: 3px;
-}
-
-.cards {
-  margin-top: 10px;
-}
-
-.card {
-  background: #e3e3e3;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.add-list {
-  background: #669bb9;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 3px;
-  width: 40%;
-  height: 50%;
-  margin-top: 10px;
-}
-.add-card {
-  background: #669bb9;
-  color: white;
-  border: none;
-  padding: 10px;
-  cursor: pointer;
-  border-radius: 3px;
-  width: 100%;
-  margin-top: 10px;
-}
-
-
-
-
-.card {
-  position: relative;
-  background: white;
-  padding: 10px;
-  margin: 5px 0;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-}
-
-.edit-icon {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  font-size: 18px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-
-.edit-icon:hover {
-  opacity: 1;
-}
-
-input {
-  width: 90%;
-  padding: 5px;
-  border: none;
-  font-size: 14px;
-  background: #f8f9fa;
-  border-radius: 3px;
-}
-
-
-
-/* Footer code */
-
-.footer {
-  text-align: center;
-  padding: 10px;
-  background-color: #f1f1f1;
-  font-size: 14px;
-  position: fixed;
-  width: 100%;
-  bottom: 0;
-  left: 0;
-  color: #333;
-  border-top: 1px solid #ccc;
-}
-
-/* .app {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-} */
-
-/* .header {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  max-width: 1200px;
-  background: #7ebaddf0;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 5px;
-} */
-
-
 .app {
   display: flex;
   flex-direction: column;
   height: 100vh;
 }
-
-/* Fixed Header */
 .header {
   background-color: #0079bf;
   color: white;
@@ -240,41 +24,135 @@ input {
   z-index: 100;
 }
 
-/* Board Container - Horizontally Scrollable */
 .board-container {
-  flex-grow: 1;
-  overflow-x: auto;  /* Enables horizontal scrolling for lists only */
-  overflow-y: hidden;
+  overflow-x: auto;
+  white-space: nowrap;
   padding: 10px;
-  margin-top: 50px; /* Avoid overlapping header */
+}
+.title {
+  font-size: 24px;
+  font-weight: bold;
 }
 
-/* Board (Holds Lists) */
+.reset-button {
+  background: #d41b28;
+  border: none;
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
 .board {
   display: flex;
-  gap: 16px;
+  overflow-x: auto;
+  padding-top: 50px;
   padding-bottom: 10px;
+
+  gap: 16px;
+  padding: 20px;
+  max-width: 1200px;
   min-width: fit-content;
+}
+.board-container {
+  flex-grow: 1;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 10px;
+  margin-top: 50px;
 }
 
 /* Lists */
 .list {
-  background: #f4f4f4;
+  background: rgb(143, 193, 222);
+  margin-top: 20px;
   padding: 10px;
+  width: 250px;
   min-width: 300px;
   border-radius: 8px;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   display: inline-block;
   vertical-align: top;
 }
+.add-list {
+  background: #4caeae;
+  color: white;
+  margin-top: 50px;
 
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 40%;
+  height: 50%;
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f4eaea;
+}
+
+.list-title {
+  font-size: 20px;
+}
+
+.delete-list {
+  background: rgb(250, 63, 63);
+  color: white;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  padding: 10px;
+  border-radius: 3px;
+}
+input {
+  width: 90%;
+  padding: 5px;
+  border: none;
+  font-size: 14px;
+  background: #f8f9fa;
+  border-radius: 3px;
+}
+
+/* Cards */
+
+.card {
+  position: relative;
+  background: #d5dbdb;
+  padding: 10px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+}
+.add-card {
+  background: #669bb9;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 3px;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+}
+.cards {
+  margin-top: 10px;
+}
 
 .modal {
   position: fixed;
   top: 50%;
   left: 50%;
+  z-index: 1;
   transform: translate(-50%, -50%);
-  background: white;
+  background: rgb(145, 222, 255);
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
@@ -283,8 +161,9 @@ input {
 .modal-content {
   display: flex;
   flex-direction: column;
+  /* margin: 10px;
+  padding: 10px; */
 }
-
 
 .due-date {
   display: flex;
@@ -297,4 +176,64 @@ input {
 
 .calendar-icon {
   color: #ff9800;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 15px;
+}
+
+.modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background 0.3s ease-in-out;
+}
+
+.modal-actions button:first-child {
+  background-color: #ccc;
+  color: #333;
+}
+
+.modal-actions button:first-child:hover {
+  background-color: #bbb;
+}
+
+.modal-actions button:nth-child(2) {
+  background-color: #4caf50;
+  color: white;
+}
+
+.modal-actions button:nth-child(2):hover {
+  background-color: #45a049;
+}
+
+.modal-actions button:nth-child(3) {
+  background-color: #f44336;
+  color: white;
+}
+
+.modal-actions button:nth-child(3):hover {
+  background-color: #d32f2f;
+}
+
+/* Footer code */
+
+.footer {
+  text-align: center;
+  padding: 10px;
+  background-color: #f1f1f1;
+  font-size: 14px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  color: #333;
+  border-top: 1px solid #ccc;
 }

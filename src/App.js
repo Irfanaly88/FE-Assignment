@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { DndProvider, useDrag, useDrop } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
@@ -24,11 +23,11 @@ const App = () => {
   }, [lists]);
 
   const addList = () => {
-    const title = prompt("Enter list title:");
+    const title = prompt("Enter a title for the list:");
     if (title) setLists([...lists, { id: uuidv4(), title, cards: [] }]);
   };
 
-const removeList = (listId) => {
+  const removeList = (listId) => {
     setLists(lists.filter((list) => list.id !== listId));
   };
 
@@ -38,30 +37,52 @@ const removeList = (listId) => {
       setLists(
         lists.map((list) =>
           list.id === listId
-            ? { ...list, cards: [...list.cards, { id: uuidv4(), title, description: "", dueDate: "" }] }
+            ? {
+                ...list,
+                cards: [
+                  ...list.cards,
+                  { id: uuidv4(), title, description: "", dueDate: "" },
+                ],
+              }
             : list
         )
       );
     }
   };
 
-  const moveCard = (cardId, fromListId, toListId) => {
-    let cardToMove;
-    const updatedLists = lists.map((list) => {
-      if (list.id === fromListId) {
-        cardToMove = list.cards.find((card) => card.id === cardId);
-        return { ...list, cards: list.cards.filter((card) => card.id !== cardId) };
-      }
-      return list;
-    });
+  const moveCard = (cardId, fromListId, toListId, toIndex) => {
+    setLists((prevLists) => {
+      let movedCard = null;
+      const updatedLists = prevLists.map((list) => {
+        if (list.id === fromListId) {
+          movedCard = list.cards.find((card) => card.id === cardId);
+          return {
+            ...list,
+            cards: list.cards.filter((card) => card.id !== cardId),
+          };
+        }
+        return list;
+      });
 
-    if (cardToMove) {
-      setLists(
-        updatedLists.map((list) =>
-          list.id === toListId ? { ...list, cards: [...list.cards, cardToMove] } : list
-        )
-      );
-    }
+      return updatedLists.map((list) => {
+        if (list.id === toListId && movedCard) {
+          const updatedCards = [...list.cards];
+          updatedCards.splice(toIndex, 0, movedCard);
+          return { ...list, cards: updatedCards };
+        }
+        return list;
+      });
+    });
+  };
+
+  const removeCard = (listId, cardId) => {
+    setLists((prevLists) =>
+      prevLists.map((list) =>
+        list.id === listId
+          ? { ...list, cards: list.cards.filter((card) => card.id !== cardId) }
+          : list
+      )
+    );
   };
 
   const moveList = (fromIndex, toIndex) => {
@@ -92,31 +113,35 @@ const removeList = (listId) => {
       )
     );
   };
-  
 
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="app">
         <header className="header">
           <h1 className="title">Trello Clone</h1>
-          <button className="reset-button" onClick={() => setLists([])}>Reset Board</button>
+          <button className="reset-button" onClick={() => setLists([])}>
+            Clears all lists and cards
+          </button>
         </header>
         <div className="board-container">
           <div className="board">
             {lists.map((list, index) => (
-              <List 
-                key={list.id} 
-                list={list} 
-                index={index} 
-                moveList={moveList} 
-                removeList={removeList} 
-                addCard={addCard} 
-                moveCard={moveCard} 
-                updateCard={updateCard} 
-                updateListTitle={updateListTitle} 
+              <List
+                key={list.id}
+                list={list}
+                index={index}
+                moveList={moveList}
+                removeList={removeList}
+                addCard={addCard}
+                moveCard={moveCard}
+                updateCard={updateCard}
+                removeCard={removeCard} 
+                updateListTitle={updateListTitle}
               />
             ))}
-            <button className="add-list" onClick={addList}>+ Add another list</button>
+            <button className="add-list" onClick={addList}>
+              Add a new list
+            </button>
           </div>
         </div>
         <footer className="footer">
@@ -127,49 +152,74 @@ const removeList = (listId) => {
   );
 };
 
-const List = ({ list, index, moveList, removeList, addCard, moveCard, updateCard, updateListTitle }) => {
+// List compnent
+
+const List = ({
+  list,
+  index,
+  moveList,
+  removeList,
+  addCard,
+  moveCard,
+  updateCard,
+  removeCard,
+  updateListTitle,
+}) => {
   const listRef = useRef(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(list.title);
 
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemTypes.LIST,
+    item: { id: list.id, index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
   const [, drop] = useDrop({
-    accept: ItemTypes.CARD,
-    drop: (item) => {
-      if (item.fromListId !== list.id) {
-        moveCard(item.id, item.fromListId, list.id);
+    accept: ItemTypes.LIST,
+    hover: (draggedItem) => {
+      if (draggedItem.index !== index) {
+        moveList(draggedItem.index, index);
+        draggedItem.index = index;
       }
     },
   });
 
-  drop(listRef);
+  const [, cardDrop] = useDrop({
+    accept: ItemTypes.CARD,
+    hover: (draggedItem) => {
+      if (draggedItem.fromListId !== list.id) {
+        moveCard(
+          draggedItem.id,
+          draggedItem.fromListId,
+          list.id,
+          list.cards.length
+        );
+        draggedItem.fromListId = list.id;
+      }
+    },
+  });
 
-  const handleTitleChange = (e) => setEditedTitle(e.target.value);
-
-  const handleTitleBlur = () => {
-    if (editedTitle.trim() === "") {
-      setEditedTitle(list.title);
-    } else {
-      updateListTitle(list.id, editedTitle);
-    }
-    setIsEditing(false);
-  };
-
-  const handleTitleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      handleTitleBlur();
-    }
-  };
+  drag(drop(cardDrop(listRef)));
 
   return (
-    <div ref={listRef} className="list">
+    <div
+      ref={listRef}
+      className="list"
+      style={{ opacity: isDragging ? 0.5 : 1 }}
+    >
       <div className="list-header">
         {isEditing ? (
           <input
             type="text"
             value={editedTitle}
-            onChange={handleTitleChange}
-            onBlur={handleTitleBlur}
-            onKeyDown={handleTitleKeyDown}
+            onChange={(e) => setEditedTitle(e.target.value)}
+            onBlur={() => {
+              updateListTitle(list.id, editedTitle);
+              setIsEditing(false);
+            }}
             autoFocus
           />
         ) : (
@@ -177,27 +227,36 @@ const List = ({ list, index, moveList, removeList, addCard, moveCard, updateCard
             {list.title}
           </h3>
         )}
-        <button className="delete-list" onClick={() => removeList(list.id)}>X</button>
+        <button className="delete-list" onClick={() => removeList(list.id)}>
+          X
+        </button>
       </div>
+
       <div className="cards">
-        {list.cards.map((card) => (
-          <Card key={card.id} card={card} listId={list.id} moveCard={moveCard} updateCard={updateCard} />
+        {list.cards.map((card, index) => (
+          <Card
+            key={card.id}
+            card={card}
+            listId={list.id}
+            index={index}
+            moveCard={moveCard}
+            removeCard={removeCard}
+            updateCard={updateCard}
+          />
         ))}
       </div>
-      <button className="add-card" onClick={() => addCard(list.id)}>+ Add a card</button>
+      <button className="add-card" onClick={() => addCard(list.id)}>
+        {" "}
+        Add new card
+      </button>
     </div>
   );
 };
 
-const Card = ({ card, listId, moveCard, updateCard }) => {
-  const [{ isDragging }, drag] = useDrag({
-    type: ItemTypes.CARD,
-    item: { id: card.id, fromListId: listId },
-    collect: (monitor) => ({
-      isDragging: !!monitor.isDragging(),
-    }),
-  });
+// Card component
 
+const Card = ({ card, listId, index, moveCard, removeCard, updateCard }) => {
+  const cardRef = useRef(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editedCard, setEditedCard] = useState({
     title: card.title,
@@ -205,16 +264,39 @@ const Card = ({ card, listId, moveCard, updateCard }) => {
     dueDate: card.dueDate || "",
   });
 
+  const [{ isDragging }, drag] = useDrag({
+    type: ItemTypes.CARD,
+    item: { id: card.id, fromListId: listId, index },
+    collect: (monitor) => ({
+      isDragging: monitor.isDragging(),
+    }),
+  });
+
+  const [, drop] = useDrop({
+    accept: ItemTypes.CARD,
+    hover: (draggedItem) => {
+      if (draggedItem.index !== index && draggedItem.fromListId === listId) {
+        moveCard(draggedItem.id, draggedItem.fromListId, listId, index);
+        draggedItem.index = index;
+      }
+    },
+  });
+
+  drag(drop(cardRef));
+
   const handleSave = () => {
     updateCard(listId, card.id, editedCard);
     setIsModalOpen(false);
   };
 
-  
-
   return (
     <>
-      <div ref={drag} className="card" style={{ opacity: isDragging ? 0.5 : 1 }} onClick={() => setIsModalOpen(true)}>
+      <div
+        ref={cardRef}
+        className="card"
+        style={{ opacity: isDragging ? 0.5 : 1 }}
+        onClick={() => setIsModalOpen(true)}
+      >
         <p>{card.title}</p>
         {card.dueDate && (
           <div className="due-date">
@@ -228,19 +310,36 @@ const Card = ({ card, listId, moveCard, updateCard }) => {
         <div className="modal">
           <div className="modal-content">
             <h2>Edit Card</h2>
-            <label>Title:</label>
-            <input type="text" value={editedCard.title} onChange={(e) => setEditedCard({ ...editedCard, title: e.target.value })} />
+            <label>Edit the title</label>
+            <input
+              type="text"
+              value={editedCard.title}
+              onChange={(e) =>
+                setEditedCard({ ...editedCard, title: e.target.value })
+              }
+            />
 
             <label>Description:</label>
-            <textarea value={editedCard.description} onChange={(e) => setEditedCard({ ...editedCard, description: e.target.value })}></textarea>
+            <textarea
+              value={editedCard.description}
+              onChange={(e) =>
+                setEditedCard({ ...editedCard, description: e.target.value })
+              }
+            ></textarea>
 
             <label>Due Date:</label>
-            <input type="date" value={editedCard.dueDate} onChange={(e) => setEditedCard({ ...editedCard, dueDate: e.target.value })} />
+            <input
+              type="date"
+              value={editedCard.dueDate}
+              onChange={(e) =>
+                setEditedCard({ ...editedCard, dueDate: e.target.value })
+              }
+            />
 
             <div className="modal-actions">
               <button onClick={() => setIsModalOpen(false)}>Close</button>
               <button onClick={handleSave}>Save</button>
-              {/* <button onClick={handleDelete}>delete</button> */}
+              <button onClick={() => {removeCard(listId, card.id); setIsModalOpen(false); }}> 🗑 Delete </button>
             </div>
           </div>
         </div>
@@ -250,242 +349,3 @@ const Card = ({ card, listId, moveCard, updateCard }) => {
 };
 
 export default App;
-
-
-
-// import { useState, useEffect, useRef } from "react";
-// import { DndProvider, useDrag, useDrop } from "react-dnd";
-// import { HTML5Backend } from "react-dnd-html5-backend";
-// import { v4 as uuidv4 } from "uuid";
-// import "./App.css";
-// import { FaCalendarAlt } from "react-icons/fa";
-
-
-// const ItemTypes = {
-//   CARD: "card",
-//   LIST: "list",
-// };
-
-// const App = () => {
-//   const [lists, setLists] = useState([]);
-
-//   useEffect(() => {
-//     const savedBoard = localStorage.getItem("trelloBoard");
-//     if (savedBoard) setLists(JSON.parse(savedBoard));
-//   }, []);
-
-//   useEffect(() => {
-//     localStorage.setItem("trelloBoard", JSON.stringify(lists));
-//   }, [lists]);
-
-//   const addList = () => {
-//     const title = prompt("Enter list title:");
-//     if (title) setLists([...lists, { id: uuidv4(), title, cards: [] }]);
-//   };
-
-//   const removeList = (listId) => {
-//     setLists(lists.filter((list) => list.id !== listId));
-//   };
-
-//   const addCard = (listId) => {
-//     const title = prompt("Enter card title:");
-//     if (title) {
-//       setLists(
-//         lists.map((list) =>
-//           list.id === listId
-//             ? { ...list, cards: [...list.cards, { id: uuidv4(), title, description: "", dueDate: "" }] }
-//             : list
-//         )
-//       );
-//     }
-//   };
-
-
-//   const moveCard = (cardId, fromListId, toListId) => {
-//     let cardToMove;
-//     const updatedLists = lists.map((list) => {
-//       if (list.id === fromListId) {
-//         cardToMove = list.cards.find((card) => card.id === cardId);
-//         return { ...list, cards: list.cards.filter((card) => card.id !== cardId) };
-//       }
-//       return list;
-//     });
-  
-//     if (cardToMove) {
-//       setLists(
-//         updatedLists.map((list) =>
-//           list.id === toListId ? { ...list, cards: [...list.cards, cardToMove] } : list
-//         )
-//       );
-//     }
-//   };
-  
-//   const moveList = (fromIndex, toIndex) => {
-//     const updatedLists = [...lists];
-//     const [movedList] = updatedLists.splice(fromIndex, 1);
-//     updatedLists.splice(toIndex, 0, movedList);
-//     setLists(updatedLists);
-//   };
-
-//   const updateCard = (listId, cardId, updatedData) => {
-//     setLists(
-//       lists.map((list) =>
-//         list.id === listId
-//           ? {
-//               ...list,
-//               cards: list.cards.map((card) =>
-//                 card.id === cardId ? { ...card, ...updatedData } : card
-//               ),
-//             }
-//           : list
-//       )
-//     );
-//   };
-
-//   return (
-//     <DndProvider backend={HTML5Backend}>
-//       <div className="app">
-//         <header className="header">
-//           <h1 className="title">Trello Clone</h1>
-//           <button className="reset-button" onClick={() => setLists([])}>Reset Board</button>
-//         </header>
-//         <div className="board-container">
-//           <div className="board">
-//             {lists.map((list, index) => (
-//               <List key={list.id} list={list} index={index} moveList={moveList} removeList={removeList} addCard={addCard} moveCard={moveCard} updateCard={updateCard} />
-//             ))}
-//             <button className="add-list" onClick={addList}>+ Add another list</button>
-//           </div>
-//         </div>
-//         <footer className="footer">
-//           <p>Developed by Irfan Ali | Trello Clone Project</p>
-//         </footer>
-//       </div>
-//     </DndProvider>
-//   );
-// };
-
-// const useDragDropList = (index, moveList) => {
-//   const ref = useRef(null);
-
-//   const [, drop] = useDrop({
-//     accept: ItemTypes.LIST,
-//     hover: (draggedItem) => {
-//       if (draggedItem.index !== index) {
-//         moveList(draggedItem.index, index);
-//         draggedItem.index = index;
-//       }
-//     },
-//   });
-
-//   const [{ isDragging }, drag] = useDrag({
-//     type: ItemTypes.LIST,
-//     item: { index },
-//     collect: (monitor) => ({
-//       isDragging: monitor.isDragging(),
-//     }),
-//   });
-
-//   drag(drop(ref));
-
-//   return [ref, isDragging];
-// };
-
-
-
-
-// const List = ({ list, index, moveList, removeList, addCard, moveCard, updateCard }) => {
-//   const listRef = useRef(null); // Create a ref for the list div
-
-//   const [, drop] = useDrop({
-//     accept: ItemTypes.CARD,
-//     drop: (item) => {
-//       if (item.fromListId !== list.id) {
-//         moveCard(item.id, item.fromListId, list.id);
-//       }
-//     },
-//   });
-
-//   drop(listRef); // Attach drop to the list div
-
-//   return (
-//     <div ref={listRef} className="list">
-//       <div className="list-header">
-//         <h3 className="list-title">{list.title}</h3>
-//         <button className="delete-list" onClick={() => removeList(list.id)}>X</button>
-//       </div>
-//       <div className="cards">
-//         {list.cards.map((card) => (
-//           <Card key={card.id} card={card} listId={list.id} moveCard={moveCard} updateCard={updateCard} />
-//         ))}
-//       </div>
-//       <button className="add-card" onClick={() => addCard(list.id)}>+ Add a card</button>
-//     </div>
-//   );
-// };
-
-
-
-
-
-// const Card = ({ card, listId, moveCard, updateCard }) => {
-//   const [{ isDragging }, drag] = useDrag({
-//     type: ItemTypes.CARD,
-//     item: { id: card.id, fromListId: listId },
-//     collect: (monitor) => ({
-//       isDragging: !!monitor.isDragging(),
-//     }),
-//   });
-
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [editedCard, setEditedCard] = useState({
-//     title: card.title,
-//     description: card.description || "",
-//     dueDate: card.dueDate || "",
-//   });
-
-//   const handleSave = () => {
-//     updateCard(listId, card.id, editedCard);
-//     setIsModalOpen(false);
-//   };
-
-//   return (
-//     <>
-//       <div ref={drag} className="card" style={{ opacity: isDragging ? 0.5 : 1 }} onClick={() => setIsModalOpen(true)}>
-//         <p>{card.title}</p>
-//         {card.dueDate && (
-//           <div className="due-date">
-//             <FaCalendarAlt className="calendar-icon" />
-//             <span>{card.dueDate}</span>
-//           </div>
-//         )}
-//       </div>
-
-//       {isModalOpen && (
-//         <div className="modal">
-//           <div className="modal-content">
-//             <h2>Edit Card</h2>
-//             <label>Title:</label>
-//             <input type="text" value={editedCard.title} onChange={(e) => setEditedCard({ ...editedCard, title: e.target.value })} />
-
-//             <label>Description:</label>
-//             <textarea value={editedCard.description} onChange={(e) => setEditedCard({ ...editedCard, description: e.target.value })}></textarea>
-
-//             <label>Due Date:</label>
-//             <input type="date" value={editedCard.dueDate} onChange={(e) => setEditedCard({ ...editedCard, dueDate: e.target.value })} />
-
-//             <div className="modal-actions">
-//               <button onClick={() => setIsModalOpen(false)}>Close</button>
-//               <button onClick={handleSave}>Save</button>
-//             </div>
-//           </div>
-//         </div>
-//       )}
-//     </>
-//   );
-// };
-
-// export default App;
-
-
-
